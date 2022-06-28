@@ -16,8 +16,8 @@ LOCAL_PATH := $(call my-dir)
 
 MKDTIMG    := $(HOST_OUT_EXECUTABLES)/mkdtimg$(HOST_EXECUTABLE_SUFFIX)
 KERNEL_OUT := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ
-DTB_DIR    := $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/dts/samsung
-DTB_CFG    := $(LOCAL_PATH)/m31.cfg
+DTB_DIR    := $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/dts/exynos
+DTB_CFG    := $(LOCAL_PATH)/exynos9610.cfg
 
 INSTALLED_DTBIMAGE_TARGET := $(PRODUCT_OUT)/dtb.img
 

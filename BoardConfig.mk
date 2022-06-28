@@ -60,24 +60,18 @@ TARGET_BOARD_PLATFORM_GPU := mali-g72
 PLATFORM_SECURITY_PATCH := 2021-05-01
 
 # Kernel
-ifeq ($(BUILD_KERNEL_FROM_SOURCE), true)
-    TARGET_KERNEL_CONFIG := exynos9610-m31nsxx_defconfig
-    TARGET_KERNEL_ARCH := arm64
-    TARGET_KERNEL_HEADER_ARCH := arm64
-    TARGET_KERNEL_SOURCE := kernel/samsung/m31
-    BOARD_CUSTOM_BOOTIMG := true
-    BOARD_CUSTOM_BOOTIMG_MK := $(COMMON_PATH)/kernel/mkbootimg.mk
-    BOARD_DTBO_CFG := $(DEVICE_PATH)/kernel/dtbo.cfg
-#    BOARD_CUSTOM_DTBOIMG_MK := $(COMMON_PATH)/kernel/dtboimg.mk
-#    BOARD_CUSTOM0_OFFSET := 0x00000000
-else
-    TARGET_PREBUILT_KERNEL := device/samsung/m31/prebuilt/Image
-    BOARD_PREBUILT_DTBIMAGE_DIR := device/samsung/m31/prebuilt/dtb
-    BOARD_PREBUILT_DTBOIMAGE := device/samsung/m31/prebuilt/recoverydtbo
-endif
+TARGET_KERNEL_CONFIG := exynos9610-m31nsxx_defconfig
+TARGET_KERNEL_HEADER_ARCH := arm64
+TARGET_KERNEL_SOURCE := kernel/samsung/m31
+BOARD_CUSTOM_BOOTIMG := true
+BOARD_CUSTOM_BOOTIMG_MK := $(COMMON_PATH)/kernel/mkbootimg.mk
+BOARD_DTBO_CFG := $(DEVICE_PATH)/kernel/dtbo.cfg
+#TARGET_PREBUILT_KERNEL := device/samsung/m31/prebuilt/Image
+#BOARD_PREBUILT_DTBIMAGE_DIR := device/samsung/m31/prebuilt/dtb
+#BOARD_PREBUILT_DTBOIMAGE := device/samsung/m31/prebuilt/recoverydtbo
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 BOARD_INCLUDE_RECOVERY_DTBO := true
-TARGET_KERNEL_ARCH := arm64
+BOARD_KERNEL_SEPERATE_DTBO := true
 
 # Kernel
 BOARD_KERNEL_IMAGE_NAME := Image
