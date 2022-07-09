@@ -15,6 +15,7 @@
 #
 
 COMMON_PATH := device/samsung/m31
+PRODUCT_OUT := out/target/product/m31
 
 # Bootloader
 BOARD_VENDOR := samsung
@@ -78,11 +79,18 @@ BOARD_KERNEL_IMAGE_NAME := Image
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_CMDLINE := androidboot.hardware=universal9611
+BOARD_MKBOOTIMG_ARGS := --dtb_offset 0x00000000
 BOARD_MKBOOTIMG_ARGS += --kernel_offset 0x00008000
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset 0x01000000
 BOARD_MKBOOTIMG_ARGS += --tags_offset 0x00000100
 BOARD_MKBOOTIMG_ARGS += --header_version 2
 BOARD_MKBOOTIMG_ARGS += --board SRPSL10A002KU
+BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
+BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
+#BOARD_MKBOOTIMG_ARGS += --kernel $(recovery_kernel)
+BOARD_MKBOOTIMG_ARGS += --ramdisk $(PRODUCT_OUT)/ramdisk-recovery.img
+BOARD_MKBOOTIMG_ARGS += --cmdline $(BOARD_KERNEL_CMDLINE)
+BOARD_MKBOOTIMG_ARGS += --kernel $(PRODUCT_OUT)/kernel
 
 # Recovery
 BOARD_HAS_LARGE_FILESYSTEM := true

@@ -17,13 +17,17 @@ LOCAL_PATH := $(call my-dir)
 MKDTIMG    := $(HOST_OUT_EXECUTABLES)/mkdtimg$(HOST_EXECUTABLE_SUFFIX)
 KERNEL_OUT := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ
 DTB_DIR    := $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/dts/exynos
-DTB_CFG    := $(LOCAL_PATH)/exynos9610.cfg
+DTBO_DIR   := $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/dts/samsung
+DTB_CFG    := $(COMMON_PATH)/kernel/$(TARGET_SOC).cfg
+DTBO_CFG   := $(COMMON_PATH)/kernel/$(TARGET_DEVICE).cfg
 
-INSTALLED_DTBIMAGE_TARGET := $(PRODUCT_OUT)/dtb.img
+INSTALLED_DTIMAGE_TARGET := $(PRODUCT_OUT)/dtb.img
+INSTALLED_DTBOIMAGE_TARGET := $(PRODUCT_OUT)/dtbo.img
 
 define build-dtbimage-target
-	@echo "Building dtb.img"
+	$(call pretty,"Target DTB image: $@")
 	$(MKDTIMG) cfg_create $@ $(DTB_CFG) -d $(DTB_DIR)
+	$(hide) chmod a+r $@
 endef
 
 $(INSTALLED_DTBIMAGE_TARGET): $(INSTALLED_KERNEL_TARGET) $(MKDTIMG)
@@ -31,6 +35,19 @@ $(INSTALLED_DTBIMAGE_TARGET): $(INSTALLED_KERNEL_TARGET) $(MKDTIMG)
 
 .PHONY: dtbimage
 dtbimage: $(INSTALLED_DTBIMAGE_TARGET)
+
+define build-dtboimage-target
+	$(call pretty,"Target DTBO image: $@")
+	$(MKDTIMG) cfg_create $@ $(DTBO_CFG) -d $(DTBO_DIR)
+	$(hide) chmod a+r $@
+endef
+
+$(INSTALLED_DTBOIMAGE_TARGET): $(INSTALLED_KERNEL_TARGET) $(MKDTIMG)
+	$(build-dtboimage-target)
+	@echo "Made DTBO image: $@"
+
+.PHONY: dtboimage
+dtboimage: $(INSTALLED_DTBOIMAGE_TARGET)
 
 $(INSTALLED_BOOTIMAGE_TARGET): $(MKBOOTIMG) $(AVBTOOL) $(INTERNAL_BOOTIMAGE_FILES) $(BOOTIMAGE_EXTRA_DEPS) $(INSTALLED_DTBIMAGE_TARGET) $(BOARD_AVB_BOOT_KEY_PATH)
 	$(call pretty,"Target boot image: $@")
@@ -44,9 +61,9 @@ $(INSTALLED_BOOTIMAGE_TARGET): $(MKBOOTIMG) $(AVBTOOL) $(INTERNAL_BOOTIMAGE_FILE
 	  $(BOARD_AVB_BOOT_ADD_HASH_FOOTER_ARGS)
 	@echo "Made boot image: $@"
 
-$(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(AVBTOOL) $(recovery_ramdisk) $(recovery_kernel) $(RECOVERYIMAGE_EXTRA_DEPS) $(INSTALLED_DTBIMAGE_TARGET) $(BOARD_AVB_BOOT_KEY_PATH) $(BOARD_PREBUILT_DTBOIMAGE)
+$(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(AVBTOOL) $(recovery_ramdisk) $(recovery_kernel) $(RECOVERYIMAGE_EXTRA_DEPS) $(INSTALLED_DTBIMAGE_TARGET) $(BOARD_AVB_BOOT_KEY_PATH) $(INSTALLED_DTBOIMAGE_TARGET)
 	@echo "----- Making recovery image ------"
-	$(hide) $(MKBOOTIMG) $(INTERNAL_RECOVERYIMAGE_ARGS) $(INTERNAL_MKBOOTIMG_VERSION_ARGS) $(BOARD_MKBOOTIMG_ARGS) --dtb $(INSTALLED_DTBIMAGE_TARGET) --output $@
+	$(hide) $(MKBOOTIMG) $(INTERNAL_MKBOOTIMG_VERSION_ARGS) $(BOARD_MKBOOTIMG_ARGS) --dtb $(INSTALLED_DTBIMAGE_TARGET) --recovery_dtbo $(INSTALLED_DTBOIMAGE_TARGET) --output $@
 	$(hide) echo -n "SEANDROIDENFORCE" >> $@
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_RECOVERYIMAGE_PARTITION_SIZE),raw)
 	$(hide) $(AVBTOOL) add_hash_footer \
